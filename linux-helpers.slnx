@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/folder-icons/folder-icons.csproj" />
+  </Folder>
+</Solution>
