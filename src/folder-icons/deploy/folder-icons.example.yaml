@@ -1,0 +1,78 @@
+# Folder icon rules, applied by the folder-icons user service (systemctl --user status folder-icons).
+# Dolphin has no icon inheritance, so the service writes a small ".directory" file into each matching
+# folder. When several folderIcon rules match a folder, the lowest priority number wins; on a tie
+# the rule listed first wins. After editing this file run:
+#   systemctl --user reload folder-icons
+
+# Everything below this folder is watched for new folders.
+# (Quote paths that start with ~ - a bare ~ is YAML for null.)
+root: "~"
+
+# Folder names (glob patterns) that are not descended into or watched. The folder itself can
+# still get an icon from a rule below.
+exclude: [".*", node_modules, snap, OneDrive]
+
+rules:
+  # Ensures that when a .gitignore is encountered it contains a rule to ignore this type of file or folder
+  # (in this case, the .directory file created by the folder-icons service)
+  gitIgnore:
+    - file: .directory
+
+  # type: folder      the folder at `path`
+  # type: csproj|c++|git   folders containing a marker file (built in: *.csproj; CMakeLists.txt, Makefile, *.cpp, ...;
+  #                   .git). Override the markers with `markers: ["*.fsproj"]`, or invent a type by giving markers.
+  # type: name       folders called one of `names`, only when their parent has a marker of the type in `within`
+  #                   (e.g. bin/obj directly inside a csproj folder - not a stray ~/bin).
+  # self: also the marker/path folder itself.  depth: how many levels below it (0 = none, all = everything below).
+  folderIcon:
+    # Build output folders: dashed red, only the folder itself (depth: 0). Priority 0 beats the csproj icon below.
+    - type: name
+      names: [bin]
+      within: csproj
+      icon: folder-bin
+      depth: 0
+      priority: 0
+
+    - type: name
+      names: [obj]
+      within: csproj
+      icon: folder-obj
+      depth: 0
+      priority: 0
+
+    - type: csproj
+      icon: folder-csharp
+      self: true
+      depth: all
+      priority: 1
+
+    - type: c++
+      icon: folder-cpp
+      self: true
+      depth: all
+      priority: 1
+
+    - type: git
+      icon: folder-git
+      self: true
+      depth: all
+      priority: 2
+
+    - type: folder
+      path: "~/source"
+      icon: folder-csharp
+      self: true      # also give ~/source itself the icon
+      depth: all        # 1 = direct children, 2 = grandchildren too, all = everything below
+      priority: 3
+
+    - type: folder
+      path: "~/OneDrive"
+      icon: folder-onedrive
+      depth: all
+      priority: 3
+
+    - type: folder
+      path: "~/crash-reports"
+      icon: folder-crash
+      depth: all
+      priority: 3

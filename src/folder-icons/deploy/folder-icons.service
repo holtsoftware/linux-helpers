@@ -1,0 +1,10 @@
+[Unit]
+Description=Apply per-folder icons from ~/.config/folder-icons.yaml
+
+[Service]
+ExecStart=%h/.local/bin/folder-icons
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
